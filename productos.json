@@ -6,7 +6,8 @@
     "categoria": "indumentaria",
     "imagen": "https://picsum.photos/200/150?random=1",
     "descripcion": "Camiseta deportiva de alta calidad",
-    "whatsapp": "5491123456789"
+    "whatsapp": "5491123456789",
+    "destacado": true
   },
   {
     "id": 2,
@@ -15,7 +16,8 @@
     "categoria": "electro",
     "imagen": "https://picsum.photos/200/150?random=2",
     "descripcion": "Teléfono inteligente con cámara excelente",
-    "whatsapp": "5491123456790"
+    "whatsapp": "5491123456790",
+    "destacado": true
   },
   {
     "id": 3,
@@ -33,7 +35,8 @@
     "categoria": "servicios",
     "imagen": "https://picsum.photos/200/150?random=4",
     "descripcion": "Limpieza profunda de hogar",
-    "whatsapp": "5491123456792"
+    "whatsapp": "5491123456792",
+    "destacado": true
   },
   {
     "id": 5,

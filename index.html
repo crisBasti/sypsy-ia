@@ -21,9 +21,15 @@
                 <button id="btn-buscar">Buscar</button>
             </div>
             <div class="user-actions">
-                <div id="usuario-logueado" style="display: none;">
+                <div id="usuario-logueado" style="display: none; position: relative;">
                     <span id="usuario-info">👤 Usuario</span>
-                    <a href="#" onclick="cerrarSesion()" style="margin-left: 1rem;">Cerrar Sesión</a>
+                    <button id="menu-toggle" type="button" onclick="toggleMenu()">☰</button>
+                    <div id="menu-dropdown" class="menu-dropdown">
+                        <a href="#" onclick="mostrarMisProductos(); return false;">Mis Productos</a>
+                        <a href="#" onclick="mostrarMisVentas(); return false;">Mis Ventas</a>
+                        <a href="#" onclick="mostrarPanelUsuario(); return false;">Cargar Productos</a>
+                        <a href="#" onclick="cerrarSesion(); return false;">Cerrar Sesión</a>
+                    </div>
                 </div>
                 <div id="acciones-no-logueado">
                     <a href="#" onclick="mostrarRegistro()">Registro</a>
@@ -43,36 +49,102 @@
         </nav>
     </header>
     <main>
-        <section id="registro" style="display:none;">
-            <h2>Registro de Usuario</h2>
-            <form id="form-registro">
-                <label>Nombre: <input type="text" id="reg-nombre" required></label>
-                <label>Email: <input type="email" id="reg-email" required></label>
-                <label>Contraseña: <input type="password" id="reg-password" required></label>
-                <label>WhatsApp: <input type="text" id="reg-whatsapp" required></label>
-                <button type="submit">Registrarse</button>
-            </form>
+        <div class="page-grid">
+            <aside class="ad-panel ad-left">
+                <div class="ad-slot" data-ad-id="ad-left-1">
+                    <div class="ad-content">
+                        <h3>Publicidad</h3>
+                        <p>Espacio disponible para anuncios de clientes.</p>
+                    </div>
+                    <button class="edit-ad-btn" onclick="editarAnuncio('ad-left-1')" style="display:none;">✏️ Editar</button>
+                </div>
+                <div class="ad-slot" data-ad-id="ad-left-2">
+                    <div class="ad-content">
+                        <h3>Publicidad</h3>
+                        <p>Aquí podrás vender espacio para generar ingresos.</p>
+                    </div>
+                    <button class="edit-ad-btn" onclick="editarAnuncio('ad-left-2')" style="display:none;">✏️ Editar</button>
+                </div>
+            </aside>
+            <div class="page-content">
+                <section id="registro" style="display:none;">
+                    <h2>Registro de Usuario</h2>
+                    <form id="form-registro">
+                        <label>Nombre: <input type="text" id="reg-nombre" required></label>
+                        <label>Email: <input type="email" id="reg-email" required></label>
+                        <label>Contraseña: <input type="password" id="reg-password" required></label>
+                        <label>WhatsApp: <input type="text" id="reg-whatsapp" required></label>
+                        <button type="submit">Registrarse</button>
+                    </form>
+                </section>
+                <section id="panel-usuario" style="display:none;">
+                    <h2>Bienvenido, <span id="usuario-nombre"></span></h2>
+                    <h3>Subir Producto</h3>
+                    <form id="form-producto">
+                        <label>Nombre: <input type="text" id="prod-nombre" required></label>
+                        <label>Descripción: <textarea id="prod-desc" required></textarea></label>
+                        <label>Precio: <input type="number" id="prod-precio" required></label>
+                        <label>Categoría:
+                            <select id="prod-categoria" required>
+                                <option value="indumentaria">Indumentaria</option>
+                                <option value="electro">Electro</option>
+                                <option value="calzado">Calzado</option>
+                                <option value="servicios">Servicios</option>
+                                <option value="varios">Varios</option>
+                            </select>
+                        </label>
+                        <label>Imagen (URL): <input type="url" id="prod-imagen" required></label>
+                        <button type="submit">Subir Producto</button>
+                    </form>
+                </section>
+                <section id="mis-productos" style="display:none;">
+                    <h2>Mis Productos</h2>
+                    <div id="mis-productos-list" class="productos-grid"></div>
+                </section>
+                <section id="mis-ventas" style="display:none;">
+                    <h2>Mis Ventas</h2>
+                    <div id="mis-ventas-list"></div>
+                </section>
+                <section id="destacados">
+                    <div class="section-top">
+                        <h2>Productos Destacados</h2>
+                        <p>Recomendados y promociones especiales.</p>
+                    </div>
+                    <div id="lista-destacados" class="productos-grid"></div>
+                </section>
+                <section id="productos">
+                    <h2>Productos</h2>
+                    <div id="lista-productos" class="productos-grid"></div>
+                </section>
+            </div>
+            <aside class="ad-panel ad-right">
+                <div class="ad-slot" data-ad-id="ad-right-1">
+                    <div class="ad-content">
+                        <h3>Publicidad</h3>
+                        <p>Espacio premium para marcas y ofertas.</p>
+                    </div>
+                    <button class="edit-ad-btn" onclick="editarAnuncio('ad-right-1')" style="display:none;">✏️ Editar</button>
+                </div>
+                <div class="ad-slot" data-ad-id="ad-right-2">
+                    <div class="ad-content">
+                        <h3>Publicidad</h3>
+                        <p>Ofrece aquí tu anuncio y obtén visibilidad.</p>
+                    </div>
+                    <button class="edit-ad-btn" onclick="editarAnuncio('ad-right-2')" style="display:none;">✏️ Editar</button>
+                </div>
+            </aside>
+        </div>
+        <section id="carrito" class="carrito-modal" style="display:none;">
+            <h2>Carrito de Compras</h2>
+            <div id="carrito-lista"></div>
+            <p>Total: $<span id="total">0</span></p>
+            <button id="comprar">Comprar</button>
+            <button id="cerrar-carrito">Cerrar</button>
         </section>
-        <section id="panel-usuario" style="display:none;">
-            <h2>Bienvenido, <span id="usuario-nombre"></span></h2>
-            <h3>Subir Producto</h3>
-            <form id="form-producto">
-                <label>Nombre: <input type="text" id="prod-nombre" required></label>
-                <label>Descripción: <textarea id="prod-desc" required></textarea></label>
-                <label>Precio: <input type="number" id="prod-precio" required></label>
-                <label>Categoría:
-                    <select id="prod-categoria" required>
-                        <option value="indumentaria">Indumentaria</option>
-                        <option value="electro">Electro</option>
-                        <option value="calzado">Calzado</option>
-                        <option value="servicios">Servicios</option>
-                        <option value="varios">Varios</option>
-                    </select>
-                </label>
-                <label>Imagen (URL): <input type="url" id="prod-imagen" required></label>
-                <button type="submit">Subir Producto</button>
-            </form>
-            <button onclick="cerrarSesion()" style="margin-top: 1rem;">Cerrar Sesión</button>
+    </main>
+        <section id="mis-ventas" style="display:none;">
+            <h2>Mis Ventas</h2>
+            <div id="mis-ventas-list"></div>
         </section>
         <section id="productos">
             <h2>Productos</h2>
@@ -87,7 +159,7 @@
         </section>
     </main>
     <footer>
-        <p>&copy; 2026 SYPSY - Mercado digital</p>
+        <p>&copy; 2026 SYPSY - Lo Que Queres Ya!</p>
     </footer>
     <script src="script.js"></script>
 </body>

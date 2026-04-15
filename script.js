@@ -7,6 +7,7 @@ let categoriaActual = 'todos';
 let usuarioActual = null;
 const numeroEmpresa = '5491164521118';
 let historialBusquedas = JSON.parse(localStorage.getItem('historialBusquedas') || '[]');
+let ventas = JSON.parse(localStorage.getItem('ventas') || '[]');
 
 async function cargarProductos() {
     try {
@@ -20,12 +21,40 @@ async function cargarProductos() {
         productosOriginales = [...productos];
     }
     mostrarProductos();
+    renderDestacados();
 }
 
 function mostrarProductos(productosFiltrados = productos) {
     const lista = document.getElementById('lista-productos');
     lista.innerHTML = '';
     productosFiltrados.forEach(producto => {
+        const div = document.createElement('div');
+        div.className = 'producto';
+        div.innerHTML = `
+            <img src="${producto.imagen}" alt="${producto.nombre}">
+            <h3>${producto.nombre}</h3>
+            <p>${producto.descripcion}</p>
+            <p class="price">$${producto.precio}</p>
+            <div class="producto-actions">
+                <button onclick="agregarAlCarrito('${producto.id}')">Agregar al Carrito</button>
+                <a href="https://wa.me/${producto.whatsapp}?text=Hola,%20estoy%20interesado%20en%20${encodeURIComponent(producto.nombre)}.%20Precio:%20$${producto.precio}.%20Vendedor:%20${producto.whatsapp}.%20Empresa:%20${numeroEmpresa}" target="_blank">
+                    <button class="whatsapp-btn">Contactar por WhatsApp</button>
+                </a>
+            </div>
+        `;
+        lista.appendChild(div);
+    });
+}
+
+function renderDestacados() {
+    const lista = document.getElementById('lista-destacados');
+    if (!lista) return;
+
+    const destacados = productos.filter(p => p.destacado).slice(0, 6);
+    const items = destacados.length > 0 ? destacados : productos.slice(0, 6);
+
+    lista.innerHTML = '';
+    items.forEach(producto => {
         const div = document.createElement('div');
         div.className = 'producto';
         div.innerHTML = `
@@ -141,16 +170,22 @@ function mostrarRecomendaciones(queryActual = '') {
     }
 }
 
-function mostrarRegistro() {
-    document.getElementById('registro').style.display = 'block';
+function hideAllSections() {
+    document.getElementById('registro').style.display = 'none';
     document.getElementById('panel-usuario').style.display = 'none';
+    document.getElementById('mis-productos').style.display = 'none';
+    document.getElementById('mis-ventas').style.display = 'none';
+    document.getElementById('productos').style.display = 'none';
+}
+
+function mostrarRegistro() {
+    hideAllSections();
+    document.getElementById('registro').style.display = 'block';
 }
 
 function irAlInicio() {
-    // Ocultar panel de usuario si está visible
-    document.getElementById('registro').style.display = 'none';
-    document.getElementById('panel-usuario').style.display = 'none';
-    // Mostrar sección de productos
+    hideAllSections();
+    document.getElementById('productos').style.display = 'block';
     document.getElementById('productos').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -190,13 +225,26 @@ document.getElementById('form-registro').addEventListener('submit', registrarUsu
 
 // Cargar usuario si ya estaba registrado
 window.addEventListener('load', () => {
+    // Cargar usuario si ya estaba registrado
     const usuarioGuardado = localStorage.getItem('usuarioActual');
     if (usuarioGuardado) {
         usuarioActual = JSON.parse(usuarioGuardado);
-        document.getElementById('registro').style.display = 'none';
-        document.getElementById('panel-usuario').style.display = 'block';
-        document.getElementById('usuario-nombre').textContent = usuarioActual.nombre;
     }
+    
+    // Cargar ventas si ya existen
+    const ventasGuardadas = localStorage.getItem('ventas');
+    if (ventasGuardadas) {
+        ventas = JSON.parse(ventasGuardadas);
+    }
+    
+    // Cargar anuncios guardados
+    cargarAnuncios();
+    
+    // Actualizar interfaz de usuario
+    actualizarInterfazUsuario();
+    
+    // Cargar productos
+    cargarProductos();
 });
 
 function actualizarInterfazUsuario() {
@@ -210,6 +258,13 @@ function actualizarInterfazUsuario() {
         document.getElementById('registro').style.display = 'none';
         document.getElementById('panel-usuario').style.display = 'block';
         document.getElementById('usuario-nombre').textContent = usuarioActual.nombre;
+        
+        // Mostrar/ocultar botones de edición de anuncios
+        if (esAdministrador()) {
+            mostrarBotonesEdicion();
+        } else {
+            ocultarBotonesEdicion();
+        }
     } else {
         // Mostrar acciones para no logueados
         document.getElementById('usuario-logueado').style.display = 'none';
@@ -218,15 +273,128 @@ function actualizarInterfazUsuario() {
         // Ocultar panel de usuario
         document.getElementById('registro').style.display = 'none';
         document.getElementById('panel-usuario').style.display = 'none';
+        
+        // Ocultar botones de edición de anuncios
+        ocultarBotonesEdicion();
     }
+}
+
+function toggleMenu() {
+    const menu = document.getElementById('menu-dropdown');
+    menu.classList.toggle('show');
+}
+
+function cerrarMenu() {
+    const menu = document.getElementById('menu-dropdown');
+    if (menu.classList.contains('show')) {
+        menu.classList.remove('show');
+    }
+}
+
+function mostrarPanelUsuario() {
+    cerrarMenu();
+    hideAllSections();
+    document.getElementById('panel-usuario').style.display = 'block';
+    document.getElementById('panel-usuario').scrollIntoView({ behavior: 'smooth' });
+}
+
+function mostrarMisProductos() {
+    cerrarMenu();
+    hideAllSections();
+    document.getElementById('mis-productos').style.display = 'block';
+    renderMisProductos();
+    document.getElementById('mis-productos').scrollIntoView({ behavior: 'smooth' });
+}
+
+function mostrarMisVentas() {
+    cerrarMenu();
+    hideAllSections();
+    document.getElementById('mis-ventas').style.display = 'block';
+    renderMisVentas();
+    document.getElementById('mis-ventas').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderMisProductos() {
+    const lista = document.getElementById('mis-productos-list');
+    lista.innerHTML = '';
+    if (!usuarioActual) {
+        lista.innerHTML = '<p>Debes iniciar sesión para ver tus productos.</p>';
+        return;
+    }
+    const misProductos = productos.filter(p => p.usuario === usuarioActual.nombre);
+    if (misProductos.length === 0) {
+        lista.innerHTML = '<p>No tienes productos cargados todavía.</p>';
+        return;
+    }
+    const productosHtml = misProductos.map(prod => `
+        <div class="producto">
+            <img src="${prod.imagen}" alt="${prod.nombre}">
+            <h3>${prod.nombre}</h3>
+            <p>${prod.descripcion}</p>
+            <p class="price">$${prod.precio}</p>
+            <p class="producto-usuario">Categoría: ${prod.categoria}</p>
+        </div>
+    `).join('');
+    lista.innerHTML = productosHtml;
+}
+
+function renderMisVentas() {
+    const container = document.getElementById('mis-ventas-list');
+    container.innerHTML = '';
+    if (!usuarioActual) {
+        container.innerHTML = '<p>Debes iniciar sesión para ver tus ventas.</p>';
+        return;
+    }
+    const ventasUsuario = ventas.filter(venta => venta.usuario === usuarioActual.nombre);
+    if (ventasUsuario.length === 0) {
+        container.innerHTML = '<p>No tienes ventas registradas todavía.</p>';
+        return;
+    }
+    ventasUsuario.forEach(venta => {
+        const div = document.createElement('div');
+        div.className = 'venta-card';
+        const itemsHtml = venta.items.map(item => `<li>${item.nombre} x${item.cantidad} - $${item.precio * item.cantidad}</li>`).join('');
+        div.innerHTML = `
+            <h3>Venta #${venta.id}</h3>
+            <p><strong>Fecha:</strong> ${venta.fecha}</p>
+            <p><strong>Total:</strong> $${venta.total}</p>
+            <p><strong>Productos:</strong></p>
+            <ul>${itemsHtml}</ul>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function registrarVenta() {
+    if (!usuarioActual) return;
+    const total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+    const venta = {
+        id: Date.now(),
+        usuario: usuarioActual.nombre,
+        fecha: new Date().toLocaleString(),
+        total,
+        items: carrito.map(item => ({ id: item.id, nombre: item.nombre, cantidad: item.cantidad, precio: item.precio }))
+    };
+    ventas.push(venta);
+    localStorage.setItem('ventas', JSON.stringify(ventas));
 }
 
 function cerrarSesion() {
     localStorage.removeItem('usuarioActual');
     usuarioActual = null;
     actualizarInterfazUsuario();
+    cerrarMenu();
     alert('Sesión cerrada.');
 }
+
+document.addEventListener('click', (event) => {
+    const menu = document.getElementById('menu-dropdown');
+    const toggle = document.getElementById('menu-toggle');
+    if (!menu || !toggle) return;
+    if (!event.target.closest('#usuario-logueado')) {
+        menu.classList.remove('show');
+    }
+});
 
 function descargarJSONActualizado() {
     // Verificar si hay cambios reales
@@ -365,7 +533,8 @@ document.querySelector('.user-actions a[href="#carrito"]').addEventListener('cli
 document.getElementById('cerrar-carrito').addEventListener('click', toggleCarrito);
 document.getElementById('comprar').addEventListener('click', () => {
     if (carrito.length > 0) {
-        alert('Compra realizada!');
+        registrarVenta();
+        alert('Compra realizada! La venta se registró en Mis Ventas.');
         carrito = [];
         actualizarCarrito();
         toggleCarrito();
@@ -374,17 +543,70 @@ document.getElementById('comprar').addEventListener('click', () => {
     }
 });
 
-// Cargar todo al iniciar página
-window.addEventListener('load', () => {
-    // Cargar usuario si ya estaba registrado
-    const usuarioGuardado = localStorage.getItem('usuarioActual');
-    if (usuarioGuardado) {
-        usuarioActual = JSON.parse(usuarioGuardado);
+// Funciones para anuncios editables
+function esAdministrador() {
+    return usuarioActual && (usuarioActual.email === 'admin@sypsy.com' || usuarioActual.email === 'admin@sypmarket.com');
+}
+
+function mostrarBotonesEdicion() {
+    if (esAdministrador()) {
+        document.querySelectorAll('.edit-ad-btn').forEach(btn => {
+            btn.style.display = 'block';
+        });
     }
+}
+
+function ocultarBotonesEdicion() {
+    document.querySelectorAll('.edit-ad-btn').forEach(btn => {
+        btn.style.display = 'none';
+    });
+}
+
+function editarAnuncio(adId) {
+    const adSlot = document.querySelector(`[data-ad-id="${adId}"]`);
+    const adContent = adSlot.querySelector('.ad-content');
     
-    // Actualizar interfaz de usuario
-    actualizarInterfazUsuario();
+    const tituloActual = adContent.querySelector('h3').textContent;
+    const descripcionActual = adContent.querySelector('p').textContent;
     
-    // Cargar productos
-    cargarProductos();
-});
+    const nuevoTitulo = prompt('Nuevo título del anuncio:', tituloActual);
+    if (nuevoTitulo === null) return;
+    
+    const nuevaDescripcion = prompt('Nueva descripción del anuncio:', descripcionActual);
+    if (nuevaDescripcion === null) return;
+    
+    // Actualizar contenido
+    adContent.querySelector('h3').textContent = nuevoTitulo;
+    adContent.querySelector('p').textContent = nuevaDescripcion;
+    
+    // Guardar en localStorage
+    guardarAnuncios();
+    
+    alert('Anuncio actualizado correctamente!');
+}
+
+function guardarAnuncios() {
+    const anuncios = {};
+    document.querySelectorAll('.ad-slot').forEach(slot => {
+        const adId = slot.dataset.adId;
+        const titulo = slot.querySelector('h3').textContent;
+        const descripcion = slot.querySelector('p').textContent;
+        anuncios[adId] = { titulo, descripcion };
+    });
+    localStorage.setItem('anuncios', JSON.stringify(anuncios));
+}
+
+function cargarAnuncios() {
+    const anunciosGuardados = localStorage.getItem('anuncios');
+    if (anunciosGuardados) {
+        const anuncios = JSON.parse(anunciosGuardados);
+        Object.keys(anuncios).forEach(adId => {
+            const slot = document.querySelector(`[data-ad-id="${adId}"]`);
+            if (slot) {
+                const adContent = slot.querySelector('.ad-content');
+                adContent.querySelector('h3').textContent = anuncios[adId].titulo;
+                adContent.querySelector('p').textContent = anuncios[adId].descripcion;
+            }
+        });
+    }
+}
