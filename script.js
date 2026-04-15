@@ -100,6 +100,14 @@ function mostrarRegistro() {
     document.getElementById('panel-usuario').style.display = 'none';
 }
 
+function irAlInicio() {
+    // Ocultar panel de usuario si está visible
+    document.getElementById('registro').style.display = 'none';
+    document.getElementById('panel-usuario').style.display = 'none';
+    // Mostrar sección de productos
+    document.getElementById('productos').scrollIntoView({ behavior: 'smooth' });
+}
+
 async function registrarUsuario(event) {
     event.preventDefault();
     const nombre = document.getElementById('reg-nombre').value;
@@ -157,6 +165,32 @@ function cerrarSesion() {
     alert('Sesión cerrada.');
 }
 
+function mostrarJSONActualizado() {
+    const jsonFormateado = JSON.stringify(productos, null, 2);
+    const blob = new Blob([jsonFormateado], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    // Crear un enlace temporal para descargar
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'productos_actualizado.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('Archivo productos_actualizado.json descargado. Reemplaza el contenido de productos.json con este archivo y súbelo a GitHub.');
+}
+
+function guardarProductosEnJSON() {
+    if (productos.length === 0) {
+        alert('No hay productos para guardar.');
+        return;
+    }
+    
+    mostrarJSONActualizado();
+}
+
 
 async function subirProducto(event) {
     event.preventDefault();
@@ -202,7 +236,8 @@ async function subirProducto(event) {
             ...nuevoProducto
         };
         productos.push(productoConId);
-        alert('Producto agregado localmente. Guarda cambios en GitHub para persistir.');
+        alert('Producto agregado localmente. Para guardarlo permanentemente, actualiza productos.json manualmente.');
+        mostrarJSONActualizado();
     }
     
     mostrarProductos();

@@ -11,7 +11,7 @@
     <header id="inicio">
         <div class="header-top">
             <div class="logo">
-                <a href="#inicio" style="text-decoration: none; color: inherit;">
+                <a href="#inicio" onclick="irAlInicio()" style="text-decoration: none; color: inherit;">
                     <h1>SYPSY</h1>
                     <p class="tagline">LO QUE QUERÉS YA!</p>
                 </a>
@@ -66,7 +66,8 @@
                 <label>Imagen (URL): <input type="url" id="prod-imagen" required></label>
                 <button type="submit">Subir Producto</button>
             </form>
-            <button onclick="cerrarSesion()" style="margin-top: 1rem;">Cerrar Sesión</button>
+            <button onclick="guardarProductosEnJSON()" style="margin-top: 1rem; background: #28a745; color: white; border: none; padding: 0.75rem 1rem; border-radius: 999px; cursor: pointer;">💾 Guardar Cambios en JSON</button>
+            <button onclick="cerrarSesion()" style="margin-top: 0.5rem;">Cerrar Sesión</button>
         </section>
         <section id="productos">
             <h2>Productos</h2>
