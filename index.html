@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYPSY</title>
+    <!-- Backend Node + Firebase Admin maneja la base de datos. -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header id="inicio">
+        <div class="header-top">
+            <div class="logo">
+                <a href="#inicio" style="text-decoration: none; color: inherit;">
+                    <h1>SYPSY</h1>
+                    <p class="tagline">LO QUE QUERÉS YA!</p>
+                </a>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="busqueda" placeholder="Buscar productos...">
+                <button id="btn-buscar">Buscar</button>
+            </div>
+            <div class="user-actions">
+                <a href="#" onclick="mostrarRegistro()">Registro</a>
+                <a href="#carrito">Carrito (<span id="carrito-count">0</span>)</a>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#productos" onclick="filtrarCategoria('todos')">Todos</a></li>
+                <li><a href="#productos" onclick="filtrarCategoria('indumentaria')">Indumentaria</a></li>
+                <li><a href="#productos" onclick="filtrarCategoria('electro')">Electro</a></li>
+                <li><a href="#productos" onclick="filtrarCategoria('calzado')">Calzado</a></li>
+                <li><a href="#productos" onclick="filtrarCategoria('servicios')">Servicios</a></li>
+                <li><a href="#productos" onclick="filtrarCategoria('varios')">Varios</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="registro" style="display:none;">
+            <h2>Registro de Usuario</h2>
+            <form id="form-registro">
+                <label>Nombre: <input type="text" id="reg-nombre" required></label>
+                <label>Email: <input type="email" id="reg-email" required></label>
+                <label>Contraseña: <input type="password" id="reg-password" required></label>
+                <label>WhatsApp: <input type="text" id="reg-whatsapp" required></label>
+                <button type="submit">Registrarse</button>
+            </form>
+        </section>
+        <section id="panel-usuario" style="display:none;">
+            <h2>Subir Producto</h2>
+            <form id="form-producto">
+                <label>Nombre: <input type="text" id="prod-nombre" required></label>
+                <label>Descripción: <textarea id="prod-desc" required></textarea></label>
+                <label>Precio: <input type="number" id="prod-precio" required></label>
+                <label>Categoría:
+                    <select id="prod-categoria" required>
+                        <option value="indumentaria">Indumentaria</option>
+                        <option value="electro">Electro</option>
+                        <option value="calzado">Calzado</option>
+                        <option value="servicios">Servicios</option>
+                        <option value="varios">Varios</option>
+                    </select>
+                </label>
+                <label>Imagen (URL): <input type="url" id="prod-imagen" required></label>
+                <button type="submit">Subir Producto</button>
+            </form>
+        </section>
+        <section id="productos">
+            <h2>Productos</h2>
+            <div id="lista-productos" class="productos-grid"></div>
+        </section>
+        <section id="carrito" class="carrito-modal" style="display:none;">
+            <h2>Carrito de Compras</h2>
+            <div id="carrito-lista"></div>
+            <p>Total: $<span id="total">0</span></p>
+            <button id="comprar">Comprar</button>
+            <button id="cerrar-carrito">Cerrar</button>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 SYPSY - Mercado digital</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "sypsyia",
+  "version": "1.0.0",
+  "description": "SYPSY marketplace con backend Node y Firebase Admin",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server-simple.js",
+    "dev": "node server-simple.js",
+    "old-server": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "firebase-admin": "^12.0.0"
+  }
+}
