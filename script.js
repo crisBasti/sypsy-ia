@@ -1,6 +1,7 @@
 ﻿const productosIniciales = [];
 
 let productos = [];
+let productosOriginales = []; // Para trackear cambios
 let carrito = [];
 let categoriaActual = 'todos';
 let usuarioActual = null;
@@ -12,9 +13,11 @@ async function cargarProductos() {
         const response = await fetch('productos.json');
         if (!response.ok) throw new Error('No se pudieron cargar los productos locales.');
         productos = await response.json();
+        productosOriginales = [...productos]; // Copia de los productos originales
     } catch (error) {
         console.error('Error cargando productos locales:', error);
         productos = productosIniciales.map((p, i) => ({ id: i + 1, ...p }));
+        productosOriginales = [...productos];
     }
     mostrarProductos();
 }
@@ -225,7 +228,28 @@ function cerrarSesion() {
     alert('Sesión cerrada.');
 }
 
-function mostrarJSONActualizado() {
+function descargarJSONActualizado() {
+    // Verificar si hay cambios reales
+    if (productos.length === productosOriginales.length) {
+        const hayCambios = productos.some((prod, index) => {
+            const original = productosOriginales[index];
+            return !original || 
+                   prod.nombre !== original.nombre || 
+                   prod.precio !== original.precio || 
+                   prod.categoria !== original.categoria;
+        });
+        
+        if (!hayCambios) {
+            console.log('No hay cambios para guardar.');
+            return;
+        }
+    }
+    
+    if (productos.length === 0) {
+        alert('No hay productos para guardar.');
+        return;
+    }
+    
     const jsonFormateado = JSON.stringify(productos, null, 2);
     const blob = new Blob([jsonFormateado], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -239,16 +263,7 @@ function mostrarJSONActualizado() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    alert('Archivo productos_actualizado.json descargado. Reemplaza el contenido de productos.json con este archivo y súbelo a GitHub.');
-}
-
-function guardarProductosEnJSON() {
-    if (productos.length === 0) {
-        alert('No hay productos para guardar.');
-        return;
-    }
-    
-    mostrarJSONActualizado();
+    console.log('Archivo productos_actualizado.json descargado.');
 }
 
 
@@ -296,8 +311,11 @@ async function subirProducto(event) {
             ...nuevoProducto
         };
         productos.push(productoConId);
-        alert('Producto agregado localmente. Para guardarlo permanentemente, actualiza productos.json manualmente.');
-        mostrarJSONActualizado();
+        
+        // Descargar JSON actualizado automáticamente
+        descargarJSONActualizado();
+        
+        alert('Producto agregado localmente. Se descargó el archivo productos_actualizado.json para guardar los cambios permanentemente en GitHub.');
     }
     
     mostrarProductos();
