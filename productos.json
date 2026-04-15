@@ -1,0 +1,110 @@
+[
+  {
+    "id": 1,
+    "nombre": "Camiseta Nike",
+    "precio": 50,
+    "categoria": "indumentaria",
+    "imagen": "https://picsum.photos/200/150?random=1",
+    "descripcion": "Camiseta deportiva de alta calidad",
+    "whatsapp": "5491123456789"
+  },
+  {
+    "id": 2,
+    "nombre": "Smartphone Samsung",
+    "precio": 300,
+    "categoria": "electro",
+    "imagen": "https://picsum.photos/200/150?random=2",
+    "descripcion": "Teléfono inteligente con cámara excelente",
+    "whatsapp": "5491123456790"
+  },
+  {
+    "id": 3,
+    "nombre": "Zapatos Adidas",
+    "precio": 100,
+    "categoria": "calzado",
+    "imagen": "https://picsum.photos/200/150?random=3",
+    "descripcion": "Zapatos cómodos para running",
+    "whatsapp": "5491123456791"
+  },
+  {
+    "id": 4,
+    "nombre": "Servicio de Limpieza",
+    "precio": 80,
+    "categoria": "servicios",
+    "imagen": "https://picsum.photos/200/150?random=4",
+    "descripcion": "Limpieza profunda de hogar",
+    "whatsapp": "5491123456792"
+  },
+  {
+    "id": 5,
+    "nombre": "Libro de Programación",
+    "precio": 20,
+    "categoria": "varios",
+    "imagen": "https://picsum.photos/200/150?random=5",
+    "descripcion": "Libro moderno para aprender a programar",
+    "whatsapp": "5491123456793"
+  },
+  {
+    "id": 6,
+    "nombre": "Monitor LG 27 pulgadas",
+    "precio": 400,
+    "categoria": "electro",
+    "imagen": "https://picsum.photos/200/150?random=6",
+    "descripcion": "Monitor gamer Full HD con 144Hz",
+    "whatsapp": "5491234567890"
+  },
+  {
+    "id": 7,
+    "nombre": "Mochila deportiva",
+    "precio": 45,
+    "categoria": "indumentaria",
+    "imagen": "https://picsum.photos/200/150?random=7",
+    "descripcion": "Mochila resistente y cómoda para gym",
+    "whatsapp": "5491234567891"
+  },
+  {
+    "id": 8,
+    "nombre": "Zapatillas Nike Air Max",
+    "precio": 120,
+    "categoria": "calzado",
+    "imagen": "https://picsum.photos/200/150?random=8",
+    "descripcion": "Zapatillas deportivas con amortiguación",
+    "whatsapp": "5491234567892"
+  },
+  {
+    "id": 9,
+    "nombre": "Clases de inglés online",
+    "precio": 150,
+    "categoria": "servicios",
+    "imagen": "https://picsum.photos/200/150?random=9",
+    "descripcion": "Clases particulares de inglés con profesor nativo",
+    "whatsapp": "5491234567893"
+  },
+  {
+    "id": 10,
+    "nombre": "Auriculares Bluetooth",
+    "precio": 80,
+    "categoria": "electro",
+    "imagen": "https://picsum.photos/200/150?random=10",
+    "descripcion": "Auriculares inalámbricos con cancelación de ruido",
+    "whatsapp": "5491234567894"
+  },
+  {
+    "id": 11,
+    "nombre": "Herramienta multiusos",
+    "precio": 35,
+    "categoria": "varios",
+    "imagen": "https://picsum.photos/200/150?random=11",
+    "descripcion": "Set de herramientas profesionales",
+    "whatsapp": "5491234567895"
+  },
+  {
+    "id": 12,
+    "nombre": "Servicio de reparación de PC",
+    "precio": 100,
+    "categoria": "servicios",
+    "imagen": "https://picsum.photos/200/150?random=12",
+    "descripcion": "Reparación y mantenimiento de computadoras",
+    "whatsapp": "5491234567896"
+  }
+]

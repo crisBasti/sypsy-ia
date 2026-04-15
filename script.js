@@ -1,35 +1,4 @@
-﻿// Datos iniciales de respaldo si el backend no está disponible.
-const productosIniciales = [
-    { nombre: 'Camiseta Nike', precio: 50, categoria: 'indumentaria', imagen: 'https://picsum.photos/200/150?random=1', descripcion: 'Camiseta deportiva de alta calidad', whatsapp: '5491123456789' },
-    { nombre: 'Smartphone Samsung', precio: 300, categoria: 'electro', imagen: 'https://picsum.photos/200/150?random=2', descripcion: 'Teléfono inteligente con cámara excelente', whatsapp: '5491123456790' },
-    { nombre: 'Zapatos Adidas', precio: 100, categoria: 'calzado', imagen: 'https://picsum.photos/200/150?random=3', descripcion: 'Zapatos cómodos para running', whatsapp: '5491123456791' },
-    { nombre: 'Servicio de Limpieza', precio: 80, categoria: 'servicios', imagen: 'https://picsum.photos/200/150?random=4', descripcion: 'Limpieza profunda de hogar', whatsapp: '5491123456792' },
-    { nombre: 'Varios - Libro', precio: 20, categoria: 'varios', imagen: 'https://picsum.photos/200/150?random=5', descripcion: 'Libro de programación', whatsapp: '5491123456793' }
-];
-
-function generarProductosPrueba() {
-    const categorias = ['indumentaria', 'electro', 'calzado', 'servicios', 'varios'];
-    const nombres = {
-        indumentaria: ['Camiseta', 'Pantalón', 'Chaqueta', 'Vestido', 'Short'],
-        electro: ['Smartphone', 'Laptop', 'Tablet', 'Auriculares', 'Cargador'],
-        calzado: ['Zapatos', 'Zapatillas', 'Botas', 'Sandalias', 'Tacones'],
-        servicios: ['Limpieza', 'Reparación', 'Clases', 'Masaje', 'Jardinería'],
-        varios: ['Libro', 'Juguete', 'Herramienta', 'Accesorio', 'Decoración']
-    };
-    const productosGenerados = [];
-    for (const cat of categorias) {
-        for (let i = 1; i <= 200; i += 1) {
-            const nombreBase = nombres[cat][Math.floor(Math.random() * nombres[cat].length)];
-            const nombre = `${nombreBase} ${cat.charAt(0).toUpperCase() + cat.slice(1)} ${i}`;
-            const precio = Math.floor(Math.random() * 500) + 10;
-            const imagen = `https://picsum.photos/200/150?random=${Math.floor(Math.random() * 10000)}`;
-            const descripcion = `Descripción de ${nombre}`;
-            const whatsapp = `54911${Math.floor(Math.random() * 90000000) + 10000000}`;
-            productosGenerados.push({ nombre, precio, categoria: cat, imagen, descripcion, whatsapp });
-        }
-    }
-    return productosGenerados;
-}
+﻿const productosIniciales = [];
 
 let productos = [];
 let carrito = [];
@@ -40,15 +9,14 @@ let historialBusquedas = JSON.parse(localStorage.getItem('historialBusquedas') |
 
 async function cargarProductos() {
     try {
-        const response = await fetch('/api/productos');
-        if (!response.ok) throw new Error('No se pudieron cargar los productos desde el servidor.');
+        const response = await fetch('productos.json');
+        if (!response.ok) throw new Error('No se pudieron cargar los productos locales.');
         productos = await response.json();
-        mostrarProductos();
     } catch (error) {
-        console.error('Error cargando productos:', error);
-        productos = [...productosIniciales, ...generarProductosPrueba()].map((p, i) => ({ id: i + 1, ...p }));
-        mostrarProductos();
+        console.error('Error cargando productos locales:', error);
+        productos = productosIniciales.map((p, i) => ({ id: i + 1, ...p }));
     }
+    mostrarProductos();
 }
 
 function mostrarProductos(productosFiltrados = productos) {
@@ -203,9 +171,9 @@ async function subirProducto(event) {
 document.getElementById('form-producto').addEventListener('submit', subirProducto);
 
 function agregarAlCarrito(id) {
-    const producto = productos.find(p => p.id === id);
+    const producto = productos.find(p => p.id == id);
     if (!producto) return;
-    const existente = carrito.find(item => item.id === id);
+    const existente = carrito.find(item => item.id == id);
     if (existente) {
         existente.cantidad += 1;
     } else {
