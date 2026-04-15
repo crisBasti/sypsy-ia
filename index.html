@@ -48,7 +48,8 @@
             </form>
         </section>
         <section id="panel-usuario" style="display:none;">
-            <h2>Subir Producto</h2>
+            <h2>Bienvenido, <span id="usuario-nombre"></span></h2>
+            <h3>Subir Producto</h3>
             <form id="form-producto">
                 <label>Nombre: <input type="text" id="prod-nombre" required></label>
                 <label>Descripción: <textarea id="prod-desc" required></textarea></label>
@@ -65,6 +66,7 @@
                 <label>Imagen (URL): <input type="url" id="prod-imagen" required></label>
                 <button type="submit">Subir Producto</button>
             </form>
+            <button onclick="cerrarSesion()" style="margin-top: 1rem;">Cerrar Sesión</button>
         </section>
         <section id="productos">
             <h2>Productos</h2>

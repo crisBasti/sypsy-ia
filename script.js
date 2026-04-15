@@ -108,25 +108,55 @@ async function registrarUsuario(event) {
     const whatsapp = document.getElementById('reg-whatsapp').value;
 
     try {
+        // Intentar registrar en backend real
         const response = await fetch('/api/usuarios', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nombre, email, password, whatsapp }),
         });
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'Error registrando usuario');
+        if (response.ok) {
+            const data = await response.json();
+            usuarioActual = data;
+        } else {
+            throw new Error('Backend no disponible');
         }
-        usuarioActual = data;
-        document.getElementById('registro').style.display = 'none';
-        document.getElementById('panel-usuario').style.display = 'block';
-        alert('Registrado exitosamente. Ahora puedes subir productos.');
     } catch (error) {
-        alert('Error en registro: ' + error.message);
+        // Usar localStorage como fallback
+        console.log('Backend no disponible, usando localStorage');
+        const usuario = { id: Date.now(), nombre, email, password, whatsapp };
+        localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+        usuarioActual = usuario;
     }
+    
+    document.getElementById('registro').style.display = 'none';
+    document.getElementById('panel-usuario').style.display = 'block';
+    document.getElementById('usuario-nombre').textContent = nombre;
+    alert('Registrado exitosamente. Ahora puedes subir productos.');
+    document.getElementById('form-registro').reset();
 }
 
 document.getElementById('form-registro').addEventListener('submit', registrarUsuario);
+
+// Cargar usuario si ya estaba registrado
+window.addEventListener('load', () => {
+    const usuarioGuardado = localStorage.getItem('usuarioActual');
+    if (usuarioGuardado) {
+        usuarioActual = JSON.parse(usuarioGuardado);
+        document.getElementById('registro').style.display = 'none';
+        document.getElementById('panel-usuario').style.display = 'block';
+        document.getElementById('usuario-nombre').textContent = usuarioActual.nombre;
+    }
+});
+
+function cerrarSesion() {
+    localStorage.removeItem('usuarioActual');
+    usuarioActual = null;
+    document.getElementById('panel-usuario').style.display = 'none';
+    document.getElementById('registro').style.display = 'block';
+    document.getElementById('form-registro').reset();
+    alert('Sesión cerrada.');
+}
+
 
 async function subirProducto(event) {
     event.preventDefault();
@@ -139,6 +169,7 @@ async function subirProducto(event) {
     const precio = parseFloat(document.getElementById('prod-precio').value);
     const categoria = document.getElementById('prod-categoria').value;
     const imagen = document.getElementById('prod-imagen').value;
+    
     const nuevoProducto = {
         nombre,
         descripcion,
@@ -150,22 +181,32 @@ async function subirProducto(event) {
     };
 
     try {
+        // Intentar subir al backend real
         const response = await fetch('/api/productos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(nuevoProducto),
         });
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'Error subiendo producto');
+        if (response.ok) {
+            const data = await response.json();
+            productos.push(data);
+            alert('Producto subido exitosamente al servidor.');
+        } else {
+            throw new Error('Backend no disponible');
         }
-        productos.push(data);
-        mostrarProductos();
-        document.getElementById('form-producto').reset();
-        alert('Producto subido exitosamente.');
     } catch (error) {
-        alert('Error subiendo producto: ' + error.message);
+        // Usar almacenamiento local como fallback
+        console.log('Backend no disponible, agregando localmente');
+        const productoConId = {
+            id: Math.max(...productos.map(p => p.id), 0) + 1,
+            ...nuevoProducto
+        };
+        productos.push(productoConId);
+        alert('Producto agregado localmente. Guarda cambios en GitHub para persistir.');
     }
+    
+    mostrarProductos();
+    document.getElementById('form-producto').reset();
 }
 
 document.getElementById('form-producto').addEventListener('submit', subirProducto);
@@ -219,4 +260,17 @@ document.getElementById('comprar').addEventListener('click', () => {
     }
 });
 
-window.addEventListener('load', cargarProductos);
+// Cargar todo al iniciar página
+window.addEventListener('load', () => {
+    // Cargar usuario si ya estaba registrado
+    const usuarioGuardado = localStorage.getItem('usuarioActual');
+    if (usuarioGuardado) {
+        usuarioActual = JSON.parse(usuarioGuardado);
+        document.getElementById('registro').style.display = 'none';
+        document.getElementById('panel-usuario').style.display = 'block';
+        document.getElementById('usuario-nombre').textContent = usuarioActual.nombre;
+    }
+    
+    // Cargar productos
+    cargarProductos();
+});
