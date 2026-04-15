@@ -405,11 +405,12 @@ section#panel-usuario {
     height: 100%;
     opacity: 0;
     transition: opacity 0.5s ease;
-    background: linear-gradient(135deg, rgba(15,45,97,0.9) 0%, rgba(63,109,201,0.9) 100%);
+    z-index: 0;
 }
 
 .carousel-slide.active {
     opacity: 1;
+    z-index: 1;
 }
 
 .carousel-image {
@@ -419,6 +420,7 @@ section#panel-usuario {
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 1;
 }
 
 .carousel-info {
@@ -429,6 +431,7 @@ section#panel-usuario {
     background: linear-gradient(transparent 0%, rgba(0,0,0,0.8) 100%);
     padding: 2rem 2rem 1.5rem;
     color: white;
+    z-index: 10;
 }
 
 .carousel-title {

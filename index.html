@@ -11,7 +11,7 @@
     <header id="inicio">
         <div class="header-top">
             <div class="logo">
-                <a href="#inicio" onclick="irAlInicio()" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                <a href="#inicio" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
                     <img src="logosypsyBco.jpg" alt="SYPSY logo principal" class="logo-img">
                     <div>
                         <h1>SYPSY</h1>
@@ -113,21 +113,9 @@
                         <h2>Productos Destacados</h2>
                         <p>Recomendados y promociones especiales.</p>
                     </div>
-                    <div class="carousel-container">
-                        <div class="carousel">
-                            <div class="carousel-slide active">
-                                <img src="" alt="" class="carousel-image">
-                                <div class="carousel-info">
-                                    <h3 class="carousel-title"></h3>
-                                    <p class="carousel-price"></p>
-                                    <div class="carousel-actions">
-                                        <button class="carousel-btn" onclick="agregarAlCarritoDesdeCarrusel()">Agregar al Carrito</button>
-                                        <a href="#" target="_blank" class="carousel-btn whatsapp-btn">Contactar por WhatsApp</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-indicators"></div>
+                    <div class="carousel-container" id="carousel-container">
+                        <div class="carousel" id="carousel-main"></div>
+                        <div class="carousel-indicators" id="carousel-indicators"></div>
                     </div>
                 </section>
                 <section id="productos">

@@ -51,8 +51,8 @@ let currentSlide = 0;
 let carouselInterval;
 
 function renderDestacados() {
-    const container = document.querySelector('.carousel-container');
-    if (!container) return;
+    const carousel = document.getElementById('carousel-main');
+    if (!carousel) return;
 
     // Detener carrusel anterior si existe
     stopCarousel();
@@ -62,23 +62,41 @@ function renderDestacados() {
 
     if (productosDestacados.length === 0) return;
 
-    const carousel = document.querySelector('.carousel');
-    const indicators = document.querySelector('.carousel-indicators');
+    const indicators = document.getElementById('carousel-indicators');
+    const container = document.getElementById('carousel-container');
 
-    // Limpiar indicadores existentes
+    // Limpiar carousel y indicadores
+    carousel.innerHTML = '';
     indicators.innerHTML = '';
 
-    // Crear indicadores
-    productosDestacados.forEach((_, index) => {
+    // Crear slides dinámicamente
+    productosDestacados.forEach((producto, index) => {
+        const slide = document.createElement('div');
+        slide.className = `carousel-slide ${index === 0 ? 'active' : ''}`;
+        slide.dataset.productId = producto.id;
+        slide.innerHTML = `
+            <img src="${producto.imagen}" alt="${producto.nombre}" class="carousel-image">
+            <div class="carousel-info">
+                <h3 class="carousel-title">${producto.nombre}</h3>
+                <p class="carousel-price">$${producto.precio}</p>
+                <div class="carousel-actions">
+                    <button class="carousel-btn" onclick="agregarAlCarritoDesdeCarrusel(${producto.id})">Agregar al Carrito</button>
+                    <a href="https://wa.me/${producto.whatsapp}?text=Hola,%20estoy%20interesado%20en%20${encodeURIComponent(producto.nombre)}.%20Precio:%20$${producto.precio}.%20Vendedor:%20${producto.whatsapp}.%20Empresa:%20${numeroEmpresa}" target="_blank" class="carousel-btn whatsapp-btn">Contactar por WhatsApp</a>
+                </div>
+            </div>
+        `;
+        carousel.appendChild(slide);
+
+        // Crear indicador
         const indicator = document.createElement('div');
         indicator.className = `carousel-indicator ${index === 0 ? 'active' : ''}`;
         indicator.onclick = () => goToSlide(index);
         indicators.appendChild(indicator);
     });
 
-    // Mostrar primera slide
-    showSlide(0);
-
+    // Mostrar carrusel
+    container.style.display = 'block';
+    
     // Iniciar carrusel automático
     startCarousel();
 }
@@ -86,6 +104,9 @@ function renderDestacados() {
 function showSlide(index) {
     const slides = document.querySelectorAll('.carousel-slide');
     const indicators = document.querySelectorAll('.carousel-indicator');
+
+    // Validar índice
+    if (index < 0 || index >= slides.length) return;
 
     // Ocultar todas las slides
     slides.forEach(slide => slide.classList.remove('active'));
@@ -97,24 +118,6 @@ function showSlide(index) {
     }
     if (indicators[index]) {
         indicators[index].classList.add('active');
-    }
-
-    // Actualizar información del producto
-    const producto = productosDestacados[index];
-    if (producto) {
-        const image = document.querySelector('.carousel-image');
-        const title = document.querySelector('.carousel-title');
-        const price = document.querySelector('.carousel-price');
-        const whatsappLink = document.querySelector('.carousel-actions .whatsapp-btn');
-
-        image.src = producto.imagen;
-        image.alt = producto.nombre;
-        title.textContent = producto.nombre;
-        price.textContent = `$${producto.precio}`;
-        whatsappLink.href = `https://wa.me/${producto.whatsapp}?text=Hola,%20estoy%20interesado%20en%20${encodeURIComponent(producto.nombre)}.%20Precio:%20$${producto.precio}.%20Vendedor:%20${producto.whatsapp}.%20Empresa:%20${numeroEmpresa}`;
-
-        // Guardar ID del producto actual para el botón de carrito
-        document.querySelector('.carousel').dataset.currentProductId = producto.id;
     }
 }
 
@@ -150,12 +153,8 @@ function stopCarousel() {
     }
 }
 
-function agregarAlCarritoDesdeCarrusel() {
-    const carousel = document.querySelector('.carousel');
-    const productId = carousel.dataset.currentProductId;
-    if (productId) {
-        agregarAlCarrito(productId);
-    }
+function agregarAlCarritoDesdeCarrusel(productId) {
+    agregarAlCarrito(productId);
 }
 
 function filtrarCategoria(categoria) {
@@ -166,12 +165,22 @@ function filtrarCategoria(categoria) {
 
 function buscarProductos() {
     const query = document.getElementById('busqueda').value.toLowerCase().trim();
+    const carouselContainer = document.getElementById('carousel-container');
     
     if (query) {
         // Agregar al historial solo si no es muy corto
         if (query.length > 2) {
             historialBusquedas.push(query);
             localStorage.setItem('historialBusquedas', JSON.stringify(historialBusquedas));
+        }
+        // Ocultar carrusel cuando hay búsqueda
+        if (carouselContainer) {
+            carouselContainer.style.display = 'none';
+        }
+    } else {
+        // Mostrar carrusel cuando no hay búsqueda
+        if (carouselContainer) {
+            carouselContainer.style.display = 'block';
         }
     }
     
