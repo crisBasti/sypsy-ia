@@ -46,31 +46,116 @@ function mostrarProductos(productosFiltrados = productos) {
     });
 }
 
+let productosDestacados = [];
+let currentSlide = 0;
+let carouselInterval;
+
 function renderDestacados() {
-    const lista = document.getElementById('lista-destacados');
-    if (!lista) return;
+    const container = document.querySelector('.carousel-container');
+    if (!container) return;
+
+    // Detener carrusel anterior si existe
+    stopCarousel();
 
     const destacados = productos.filter(p => p.destacado).slice(0, 6);
-    const items = destacados.length > 0 ? destacados : productos.slice(0, 6);
+    productosDestacados = destacados.length > 0 ? destacados : productos.slice(0, 6);
 
-    lista.innerHTML = '';
-    items.forEach(producto => {
-        const div = document.createElement('div');
-        div.className = 'producto';
-        div.innerHTML = `
-            <img src="${producto.imagen}" alt="${producto.nombre}">
-            <h3>${producto.nombre}</h3>
-            <p>${producto.descripcion}</p>
-            <p class="price">$${producto.precio}</p>
-            <div class="producto-actions">
-                <button onclick="agregarAlCarrito('${producto.id}')">Agregar al Carrito</button>
-                <a href="https://wa.me/${producto.whatsapp}?text=Hola,%20estoy%20interesado%20en%20${encodeURIComponent(producto.nombre)}.%20Precio:%20$${producto.precio}.%20Vendedor:%20${producto.whatsapp}.%20Empresa:%20${numeroEmpresa}" target="_blank">
-                    <button class="whatsapp-btn">Contactar por WhatsApp</button>
-                </a>
-            </div>
-        `;
-        lista.appendChild(div);
+    if (productosDestacados.length === 0) return;
+
+    const carousel = document.querySelector('.carousel');
+    const indicators = document.querySelector('.carousel-indicators');
+
+    // Limpiar indicadores existentes
+    indicators.innerHTML = '';
+
+    // Crear indicadores
+    productosDestacados.forEach((_, index) => {
+        const indicator = document.createElement('div');
+        indicator.className = `carousel-indicator ${index === 0 ? 'active' : ''}`;
+        indicator.onclick = () => goToSlide(index);
+        indicators.appendChild(indicator);
     });
+
+    // Mostrar primera slide
+    showSlide(0);
+
+    // Iniciar carrusel automático
+    startCarousel();
+}
+
+function showSlide(index) {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+
+    // Ocultar todas las slides
+    slides.forEach(slide => slide.classList.remove('active'));
+    indicators.forEach(indicator => indicator.classList.remove('active'));
+
+    // Mostrar slide actual
+    if (slides[index]) {
+        slides[index].classList.add('active');
+    }
+    if (indicators[index]) {
+        indicators[index].classList.add('active');
+    }
+
+    // Actualizar información del producto
+    const producto = productosDestacados[index];
+    if (producto) {
+        const image = document.querySelector('.carousel-image');
+        const title = document.querySelector('.carousel-title');
+        const price = document.querySelector('.carousel-price');
+        const whatsappLink = document.querySelector('.carousel-actions .whatsapp-btn');
+
+        image.src = producto.imagen;
+        image.alt = producto.nombre;
+        title.textContent = producto.nombre;
+        price.textContent = `$${producto.precio}`;
+        whatsappLink.href = `https://wa.me/${producto.whatsapp}?text=Hola,%20estoy%20interesado%20en%20${encodeURIComponent(producto.nombre)}.%20Precio:%20$${producto.precio}.%20Vendedor:%20${producto.whatsapp}.%20Empresa:%20${numeroEmpresa}`;
+
+        // Guardar ID del producto actual para el botón de carrito
+        document.querySelector('.carousel').dataset.currentProductId = producto.id;
+    }
+}
+
+function goToSlide(index) {
+    currentSlide = index;
+    showSlide(currentSlide);
+    resetCarouselTimer();
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % productosDestacados.length;
+    showSlide(currentSlide);
+}
+
+function startCarousel() {
+    if (carouselInterval) {
+        clearInterval(carouselInterval);
+    }
+    carouselInterval = setInterval(nextSlide, 3000);
+}
+
+function resetCarouselTimer() {
+    if (carouselInterval) {
+        clearInterval(carouselInterval);
+        startCarousel();
+    }
+}
+
+function stopCarousel() {
+    if (carouselInterval) {
+        clearInterval(carouselInterval);
+        carouselInterval = null;
+    }
+}
+
+function agregarAlCarritoDesdeCarrusel() {
+    const carousel = document.querySelector('.carousel');
+    const productId = carousel.dataset.currentProductId;
+    if (productId) {
+        agregarAlCarrito(productId);
+    }
 }
 
 function filtrarCategoria(categoria) {

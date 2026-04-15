@@ -11,14 +11,17 @@
     <header id="inicio">
         <div class="header-top">
             <div class="logo">
-                <a href="#inicio" onclick="irAlInicio()" style="text-decoration: none; color: inherit;">
-                    <h1>SYPSY</h1>
-                    <p class="tagline">LO QUE QUERÉS YA!</p>
+                <a href="#inicio" onclick="irAlInicio()" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                    <img src="logosypsyBco.jpg" alt="SYPSY logo principal" class="logo-img">
+                    <div>
+                        <h1>SYPSY</h1>
+                        <p class="tagline">LO QUE QUERÉS YA!</p>
+                    </div>
                 </a>
             </div>
             <div class="search-bar">
                 <input type="text" id="busqueda" placeholder="Buscar productos...">
-                <button id="btn-buscar">Buscar</button>
+                <span class="search-icon">🔍</span>
             </div>
             <div class="user-actions">
                 <div id="usuario-logueado" style="display: none; position: relative;">
@@ -110,7 +113,22 @@
                         <h2>Productos Destacados</h2>
                         <p>Recomendados y promociones especiales.</p>
                     </div>
-                    <div id="lista-destacados" class="productos-grid"></div>
+                    <div class="carousel-container">
+                        <div class="carousel">
+                            <div class="carousel-slide active">
+                                <img src="" alt="" class="carousel-image">
+                                <div class="carousel-info">
+                                    <h3 class="carousel-title"></h3>
+                                    <p class="carousel-price"></p>
+                                    <div class="carousel-actions">
+                                        <button class="carousel-btn" onclick="agregarAlCarritoDesdeCarrusel()">Agregar al Carrito</button>
+                                        <a href="#" target="_blank" class="carousel-btn whatsapp-btn">Contactar por WhatsApp</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-indicators"></div>
+                    </div>
                 </section>
                 <section id="productos">
                     <h2>Productos</h2>
