@@ -21,8 +21,14 @@
                 <button id="btn-buscar">Buscar</button>
             </div>
             <div class="user-actions">
-                <a href="#" onclick="mostrarRegistro()">Registro</a>
-                <a href="#carrito">Carrito (<span id="carrito-count">0</span>)</a>
+                <div id="usuario-logueado" style="display: none;">
+                    <span id="usuario-info">👤 Usuario</span>
+                    <a href="#" onclick="cerrarSesion()" style="margin-left: 1rem;">Cerrar Sesión</a>
+                </div>
+                <div id="acciones-no-logueado">
+                    <a href="#" onclick="mostrarRegistro()">Registro</a>
+                    <a href="#carrito">Carrito (<span id="carrito-count">0</span>)</a>
+                </div>
             </div>
         </div>
         <nav>

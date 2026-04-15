@@ -83,6 +83,33 @@ header {
     flex-wrap: wrap;
 }
 
+#usuario-logueado {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+#usuario-info {
+    color: white;
+    font-size: 0.95rem;
+}
+
+#usuario-logueado a {
+    color: #f9c4eb;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+#usuario-logueado a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
 .user-actions a {
     color: white;
     text-decoration: none;
@@ -144,6 +171,26 @@ section h2 {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
     gap: 1.25rem;
+}
+
+.recomendaciones {
+    grid-column: 1 / -1;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 1rem;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.recomendaciones h3 {
+    color: #0f2d61;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+.recomendaciones .productos-grid {
+    margin-top: 1rem;
 }
 
 .producto {

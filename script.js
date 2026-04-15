@@ -49,32 +49,74 @@ function filtrarCategoria(categoria) {
 
 function buscarProductos() {
     const query = document.getElementById('busqueda').value.toLowerCase().trim();
+    
     if (query) {
-        historialBusquedas.push(query);
-        localStorage.setItem('historialBusquedas', JSON.stringify(historialBusquedas));
+        // Agregar al historial solo si no es muy corto
+        if (query.length > 2) {
+            historialBusquedas.push(query);
+            localStorage.setItem('historialBusquedas', JSON.stringify(historialBusquedas));
+        }
     }
-    let filtrados = productos.filter(p => p.nombre.toLowerCase().includes(query) || p.descripcion.toLowerCase().includes(query));
+    
+    let filtrados = productos;
+    
+    if (query) {
+        filtrados = productos.filter(p => 
+            p.nombre.toLowerCase().includes(query) || 
+            p.descripcion.toLowerCase().includes(query) ||
+            p.categoria.toLowerCase().includes(query)
+        );
+    }
+    
+    // Aplicar filtro de categoría si está activo
     if (categoriaActual !== 'todos') {
         filtrados = filtrados.filter(p => p.categoria === categoriaActual);
     }
+    
     mostrarProductos(filtrados);
-    mostrarRecomendaciones();
+    
+    // Mostrar recomendaciones si hay búsqueda
+    if (query && query.length > 1) {
+        mostrarRecomendaciones(query);
+    }
 }
 
-function mostrarRecomendaciones() {
-    if (historialBusquedas.length === 0) return;
-    const ultimasBusquedas = historialBusquedas.slice(-3);
-    const categoriasBuscadas = productos
-        .filter(p => ultimasBusquedas.some(b => p.nombre.toLowerCase().includes(b) || p.descripcion.toLowerCase().includes(b)))
-        .map(p => p.categoria);
-    const recomendados = productos
-        .filter(p => categoriasBuscadas.includes(p.categoria) && !ultimasBusquedas.some(b => p.nombre.toLowerCase().includes(b)))
-        .slice(0, 4);
-    if (recomendados.length > 0) {
-        const lista = document.getElementById('lista-productos');
+function mostrarRecomendaciones(queryActual = '') {
+    const lista = document.getElementById('lista-productos');
+    
+    // Limpiar recomendaciones anteriores
+    const recomendacionesAnteriores = lista.querySelector('.recomendaciones');
+    if (recomendacionesAnteriores) {
+        recomendacionesAnteriores.remove();
+    }
+    
+    if (!queryActual || queryActual.length < 2) return;
+    
+    // Buscar productos relacionados por categoría o palabras similares
+    const productosRelacionados = productos.filter(p => {
+        const queryLower = queryActual.toLowerCase();
+        const nombreLower = p.nombre.toLowerCase();
+        const descLower = p.descripcion.toLowerCase();
+        
+        // No incluir productos que ya están en los resultados de búsqueda
+        const yaMostrado = nombreLower.includes(queryLower) || descLower.includes(queryLower);
+        if (yaMostrado) return false;
+        
+        // Buscar por categoría o palabras relacionadas
+        const palabrasQuery = queryLower.split(' ');
+        return palabrasQuery.some(palabra => 
+            p.categoria.toLowerCase().includes(palabra) ||
+            nombreLower.includes(palabra) ||
+            descLower.includes(palabra)
+        );
+    }).slice(0, 6); // Máximo 6 recomendaciones
+    
+    if (productosRelacionados.length > 0) {
         const recDiv = document.createElement('div');
-        recDiv.innerHTML = '<h3>Productos Recomendados</h3>';
-        recomendados.forEach(prod => {
+        recDiv.className = 'recomendaciones';
+        recDiv.innerHTML = '<h3>🔍 Productos relacionados</h3>';
+        
+        productosRelacionados.forEach(prod => {
             const div = document.createElement('div');
             div.className = 'producto';
             div.innerHTML = `
@@ -91,6 +133,7 @@ function mostrarRecomendaciones() {
             `;
             recDiv.appendChild(div);
         });
+        
         lista.appendChild(recDiv);
     }
 }
@@ -136,10 +179,7 @@ async function registrarUsuario(event) {
         usuarioActual = usuario;
     }
     
-    document.getElementById('registro').style.display = 'none';
-    document.getElementById('panel-usuario').style.display = 'block';
-    document.getElementById('usuario-nombre').textContent = nombre;
-    alert('Registrado exitosamente. Ahora puedes subir productos.');
+    actualizarInterfazUsuario();
     document.getElementById('form-registro').reset();
 }
 
@@ -156,12 +196,32 @@ window.addEventListener('load', () => {
     }
 });
 
+function actualizarInterfazUsuario() {
+    if (usuarioActual) {
+        // Mostrar usuario logueado en header
+        document.getElementById('usuario-logueado').style.display = 'flex';
+        document.getElementById('usuario-info').textContent = `👤 ${usuarioActual.nombre}`;
+        document.getElementById('acciones-no-logueado').style.display = 'none';
+        
+        // Mostrar panel de usuario
+        document.getElementById('registro').style.display = 'none';
+        document.getElementById('panel-usuario').style.display = 'block';
+        document.getElementById('usuario-nombre').textContent = usuarioActual.nombre;
+    } else {
+        // Mostrar acciones para no logueados
+        document.getElementById('usuario-logueado').style.display = 'none';
+        document.getElementById('acciones-no-logueado').style.display = 'flex';
+        
+        // Ocultar panel de usuario
+        document.getElementById('registro').style.display = 'none';
+        document.getElementById('panel-usuario').style.display = 'none';
+    }
+}
+
 function cerrarSesion() {
     localStorage.removeItem('usuarioActual');
     usuarioActual = null;
-    document.getElementById('panel-usuario').style.display = 'none';
-    document.getElementById('registro').style.display = 'block';
-    document.getElementById('form-registro').reset();
+    actualizarInterfazUsuario();
     alert('Sesión cerrada.');
 }
 
@@ -278,6 +338,7 @@ function toggleCarrito() {
 }
 
 document.getElementById('btn-buscar').addEventListener('click', buscarProductos);
+document.getElementById('busqueda').addEventListener('input', buscarProductos); // Búsqueda dinámica
 document.getElementById('busqueda').addEventListener('keyup', (e) => {
     if (e.key === 'Enter') buscarProductos();
 });
@@ -301,10 +362,10 @@ window.addEventListener('load', () => {
     const usuarioGuardado = localStorage.getItem('usuarioActual');
     if (usuarioGuardado) {
         usuarioActual = JSON.parse(usuarioGuardado);
-        document.getElementById('registro').style.display = 'none';
-        document.getElementById('panel-usuario').style.display = 'block';
-        document.getElementById('usuario-nombre').textContent = usuarioActual.nombre;
     }
+    
+    // Actualizar interfaz de usuario
+    actualizarInterfazUsuario();
     
     // Cargar productos
     cargarProductos();
