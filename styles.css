@@ -217,6 +217,20 @@ nav a:hover {
     transform: translateY(-2px);
 }
 
+nav a.nav-link.active {
+    background: linear-gradient(135deg, #e4007c 0%, #3f6dc9 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(228, 0, 124, 0.3);
+    transform: translateY(-1px);
+}
+
+.section-label {
+    margin: 0.75rem 0 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #d80181;
+}
+
 main {
     max-width: 1400px;
     margin: 0 auto;
@@ -480,17 +494,150 @@ section#panel-usuario {
     margin-top: 1rem;
 }
 
-.carousel-indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(15,45,97,0.3);
-    cursor: pointer;
-    transition: background 0.3s ease;
+    .carousel-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3rem;
+        height: 3rem;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.92);
+        color: #0f2d61;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 14px 34px rgba(15,45,97,0.2);
+        z-index: 20;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .carousel-arrow:hover {
+        transform: translateY(-50%) scale(1.05);
+        background: #d80181;
+        color: white;
+    }
+
+    .carousel-prev {
+        left: 1rem;
+    }
+
+    .carousel-next {
+        right: 1rem;
+    }
+
 }
 
 .carousel-indicator.active {
     background: #0f2d61;
+}
+
+.producto-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 45, 97, 0.8);
+    backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 1.5rem;
+}
+
+.producto-modal-card {
+    width: min(1100px, 100%);
+    max-height: min(90vh, 900px);
+    overflow: hidden;
+    border-radius: 2rem;
+    background: #ffffff;
+    box-shadow: 0 30px 80px rgba(15,45,97,0.25);
+    position: relative;
+    display: grid;
+    gap: 1rem;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    border-radius: 50%;
+    background: rgba(15,45,97,0.95);
+    color: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+    z-index: 20;
+}
+
+.producto-modal-carousel {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 420px;
+    background: #000;
+    overflow: hidden;
+}
+
+.producto-modal-carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    max-height: 520px;
+    background: #000;
+}
+
+.modal-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    color: #0f2d61;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 20;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.modal-prev {
+    left: 1rem;
+}
+
+.modal-next {
+    right: 1rem;
+}
+
+.modal-thumbnails {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    padding: 0 1rem 1rem;
+}
+
+.modal-thumbnail {
+    width: 72px;
+    height: 72px;
+    border-radius: 1rem;
+    border: 2px solid transparent;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.modal-thumbnail:hover,
+.modal-thumbnail.active {
+    transform: translateY(-2px);
+    border-color: #d80181;
+}
+
+.modal-info {
+    padding: 1rem 2rem 2rem;
 }
 
 /* Responsive para carrusel */
@@ -558,7 +705,11 @@ section#panel-usuario {
     text-align: left;
     box-shadow: 0 20px 40px rgba(15,45,97,0.08);
     display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
     gap: 0.75rem;
+    min-height: 320px;
+    max-height: 400px;
+    overflow: hidden;
     transition: all 0.3s ease;
 }
 
@@ -573,11 +724,15 @@ section#panel-usuario {
 }
 
 .producto img {
-    width: 100%;
+    width: 95%;
     height: 140px;
     border-radius: 1.5rem;
-    object-fit: cover;
+    object-fit: contain;
+    background: #f8f9ff;
+    padding: 0.75rem;
     box-shadow: 0 14px 32px rgba(15,45,97,0.12);
+    cursor: pointer;
+    align-self: start;
 }
 
 .producto h3 {
@@ -585,17 +740,36 @@ section#panel-usuario {
     color: #0f2d61;
     font-size: 1.35rem;
     letter-spacing: 0.02em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    align-self: start;
 }
 
 .producto p {
     color: #4d5e83;
     line-height: 1.6;
+    margin: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    align-self: start;
 }
 
 .producto .price {
     font-size: 1.4rem;
     font-weight: 800;
     color: #0f2d61;
+    align-self: start;
+}
+
+.producto-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-self: end;
 }
 
 .producto-actions {
@@ -640,6 +814,70 @@ section#panel-usuario {
         0 16px 26px rgba(219,28,146,0.2),
         0 0 20px rgba(255, 0, 255, 0.4),
         0 0 40px rgba(255, 0, 255, 0.2);
+}
+
+/* Responsive para productos */
+@media (max-width: 768px) {
+    .producto {
+        min-height: 280px;
+        max-height: 350px;
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .producto img {
+        height: 120px;
+    }
+
+    .producto h3 {
+        font-size: 1.2rem;
+    }
+
+    .producto p {
+        -webkit-line-clamp: 2;
+        font-size: 0.9rem;
+    }
+
+    .producto .price {
+        font-size: 1.2rem;
+    }
+
+    .producto button,
+    .producto .whatsapp-btn {
+        padding: 0.7rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .producto {
+        min-height: 250px;
+        max-height: 320px;
+        padding: 0.5rem;
+    }
+
+    .producto img {
+        height: 100px;
+    }
+
+    .producto h3 {
+        font-size: 1.1rem;
+    }
+
+    .producto .price {
+        font-size: 1.1rem;
+    }
+
+    .producto-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .producto button,
+    .producto .whatsapp-btn {
+        padding: 0.6rem 0.7rem;
+        font-size: 0.85rem;
+    }
 }
 
 #registro, #panel-usuario {

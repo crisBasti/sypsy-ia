@@ -3,15 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYPSY</title>
+    <title>SYPSY - Comprá y vendé productos y servicios con WhatsApp</title>
+    <meta name="description" content="SYPSY es un marketplace online para comprar y vender indumentaria, electro, calzado, servicios y productos varios. Contactá rápido por WhatsApp y encontrá ofertas locales.">
+    <meta name="keywords" content="comprar online, vender por WhatsApp, marketplace, indumentaria, electro, calzado, servicios, productos varios, ofertas locales, envío rápido, tienda online, SYPSY">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="SYPSY">
+    <meta name="language" content="es">
+    <meta property="og:title" content="SYPSY - Marketplace para productos y servicios en línea">
+    <meta property="og:description" content="Compra indumentaria, electro, calzado y servicios con contacto directo por WhatsApp. Encuentra tu producto ideal en SYPSY.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:site_name" content="SYPSY">
+    <!-- Reemplazá la URL de ejemplo por tu dominio real antes de publicar -->
+    <link rel="canonical" href="https://sypsy.com.ar/">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "SYPSY",
+      "url": "https://sypsy.com.ar/",
+      "description": "SYPSY es un marketplace para comprar y vender indumentaria, electro, calzado, servicios y productos varios con contacto por WhatsApp.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://sypsy.com.ar/?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
     <!-- Backend Node + Firebase Admin maneja la base de datos. -->
     <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+       const firebaseConfig = {
+            apiKey: "AIzaSyChi_YOovZ5B_avY6YCNfk5EUYRmKTnm_4",
+            authDomain: "sypsy-web.firebaseapp.com",
+            projectId: "sypsy-web",
+            storageBucket: "sypsy-web.firebasestorage.app",
+            messagingSenderId: "19424022640",
+            appId: "1:19424022640:web:509d4741d1a2eab6af24b5",
+            measurementId: "G-BHBFR48YQB"
+            };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Configurar persistencia de sesión
+        setPersistence(auth, browserLocalPersistence).then(() => {
+            console.log('Persistencia de sesión configurada');
+        }).catch((error) => {
+            console.error('Error configurando persistencia:', error);
+        });
+
+        window.firebaseAuth = auth;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.updateProfile = updateProfile;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+    </script>
 </head>
 <body>
     <header id="inicio">
         <div class="header-top">
             <div class="logo">
-                <a href="#inicio" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
+                <a href="#inicio" onclick="irAlInicio(); return false;" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 1rem;">
                     <img src="logosypsyBco.jpg" alt="SYPSY logo principal" class="logo-img">
                     <div>
                         <h1>SYPSY</h1>
@@ -20,14 +80,15 @@
                 </a>
             </div>
             <div class="search-bar">
-                <input type="text" id="busqueda" placeholder="Buscar productos...">
-                <span class="search-icon">🔍</span>
+                <input type="text" id="busqueda" placeholder="Buscar productos..." autocomplete="off" oninput="buscarProductos()" onkeydown="if(event.key === 'Enter'){ buscarProductos(); event.preventDefault(); }">
+                <span class="search-icon" role="button" tabindex="0" onclick="buscarProductos()" onkeydown="if(event.key === 'Enter'){ buscarProductos(); }">🔍</span>
             </div>
             <div class="user-actions">
                 <div id="usuario-logueado" style="display: none; position: relative;">
                     <span id="usuario-info">👤 Usuario</span>
                     <button id="menu-toggle" type="button" onclick="toggleMenu()">☰</button>
                     <div id="menu-dropdown" class="menu-dropdown">
+                        <a href="#" onclick="toggleCarrito(); cerrarMenu(); return false;">🛒 Carrito (<span id="carrito-count-menu">0</span>)</a>
                         <a href="#" onclick="mostrarMisProductos(); return false;">Mis Productos</a>
                         <a href="#" onclick="mostrarMisVentas(); return false;">Mis Ventas</a>
                         <a href="#" onclick="mostrarPanelUsuario(); return false;">Cargar Productos</a>
@@ -35,6 +96,7 @@
                     </div>
                 </div>
                 <div id="acciones-no-logueado">
+                    <a href="#" onclick="mostrarLogin()">Iniciar Sesión</a>
                     <a href="#" onclick="mostrarRegistro()">Registro</a>
                     <a href="#carrito">Carrito (<span id="carrito-count">0</span>)</a>
                 </div>
@@ -42,12 +104,12 @@
         </div>
         <nav>
             <ul>
-                <li><a href="#productos" onclick="filtrarCategoria('todos')">Todos</a></li>
-                <li><a href="#productos" onclick="filtrarCategoria('indumentaria')">Indumentaria</a></li>
-                <li><a href="#productos" onclick="filtrarCategoria('electro')">Electro</a></li>
-                <li><a href="#productos" onclick="filtrarCategoria('calzado')">Calzado</a></li>
-                <li><a href="#productos" onclick="filtrarCategoria('servicios')">Servicios</a></li>
-                <li><a href="#productos" onclick="filtrarCategoria('varios')">Varios</a></li>
+                <li><a href="#productos" class="nav-link" data-category="todos" onclick="filtrarCategoria('todos'); return false;">Todos</a></li>
+                <li><a href="#productos" class="nav-link" data-category="indumentaria" onclick="filtrarCategoria('indumentaria'); return false;">Indumentaria</a></li>
+                <li><a href="#productos" class="nav-link" data-category="electro" onclick="filtrarCategoria('electro'); return false;">Electro</a></li>
+                <li><a href="#productos" class="nav-link" data-category="calzado" onclick="filtrarCategoria('calzado'); return false;">Calzado</a></li>
+                <li><a href="#productos" class="nav-link" data-category="servicios" onclick="filtrarCategoria('servicios'); return false;">Servicios</a></li>
+                <li><a href="#productos" class="nav-link" data-category="varios" onclick="filtrarCategoria('varios'); return false;">Varios</a></li>
             </ul>
         </nav>
     </header>
@@ -80,6 +142,14 @@
                         <button type="submit">Registrarse</button>
                     </form>
                 </section>
+                <section id="login" style="display:none;">
+                    <h2>Iniciar Sesión</h2>
+                    <form id="form-login">
+                        <label>Email: <input type="email" id="login-email" required></label>
+                        <label>Contraseña: <input type="password" id="login-password" required></label>
+                        <button type="submit">Iniciar Sesión</button>
+                    </form>
+                </section>
                 <section id="panel-usuario" style="display:none;">
                     <h2>Bienvenido, <span id="usuario-nombre"></span></h2>
                     <h3>Subir Producto</h3>
@@ -96,7 +166,10 @@
                                 <option value="varios">Varios</option>
                             </select>
                         </label>
-                        <label>Imagen (URL): <input type="url" id="prod-imagen" required></label>
+                        <label>Imágenes (hasta 8): <input type="file" id="prod-imagen" accept="image/*" multiple required onchange="mostrarVistaPreviaImagen()"></label>
+                        <div id="imagen-preview" style="margin-top: 10px; display: none;">
+                            <div id="preview-images" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px;"></div>
+                        </div>
                         <button type="submit">Subir Producto</button>
                     </form>
                 </section>
@@ -115,11 +188,14 @@
                     </div>
                     <div class="carousel-container" id="carousel-container">
                         <div class="carousel" id="carousel-main"></div>
-                        <div class="carousel-indicators" id="carousel-indicators"></div>
+                    <button class="carousel-arrow carousel-prev" onclick="prevSlide()" aria-label="Anterior">‹</button>
+                    <button class="carousel-arrow carousel-next" onclick="nextSlide()" aria-label="Siguiente">›</button>
+                    <div class="carousel-indicators" id="carousel-indicators"></div>
                     </div>
                 </section>
                 <section id="productos">
                     <h2>Productos</h2>
+                    <p class="section-label" id="categoria-activa">Mostrando: Todos los productos</p>
                     <div id="lista-productos" class="productos-grid"></div>
                 </section>
             </div>
@@ -148,25 +224,31 @@
             <button id="cerrar-carrito">Cerrar</button>
         </section>
     </main>
-        <section id="mis-ventas" style="display:none;">
-            <h2>Mis Ventas</h2>
-            <div id="mis-ventas-list"></div>
-        </section>
-        <section id="productos">
-            <h2>Productos</h2>
-            <div id="lista-productos" class="productos-grid"></div>
-        </section>
-        <section id="carrito" class="carrito-modal" style="display:none;">
-            <h2>Carrito de Compras</h2>
-            <div id="carrito-lista"></div>
-            <p>Total: $<span id="total">0</span></p>
-            <button id="comprar">Comprar</button>
-            <button id="cerrar-carrito">Cerrar</button>
-        </section>
-    </main>
     <footer>
         <p>&copy; 2026 SYPSY - Lo Que Queres Ya!</p>
     </footer>
+
+    <div id="producto-modal" class="producto-modal-overlay" onclick="if(event.target === this) cerrarModalProducto()">
+        <div class="producto-modal-card">
+            <button class="modal-close" onclick="cerrarModalProducto()" aria-label="Cerrar modal">×</button>
+            <div class="producto-modal-carousel">
+                <button type="button" class="modal-arrow modal-prev" onclick="prevModalImage()" aria-label="Anterior imagen">‹</button>
+                <img id="modal-imagen-principal" src="" alt="Imagen del producto">
+                <button type="button" class="modal-arrow modal-next" onclick="nextModalImage()" aria-label="Siguiente imagen">›</button>
+            </div>
+            <div class="modal-thumbnails" id="modal-thumbnails"></div>
+            <div class="modal-info">
+                <h3 id="modal-producto-nombre"></h3>
+                <p id="modal-producto-descripcion"></p>
+                <p class="price" id="modal-producto-precio"></p>
+                <div class="carousel-actions">
+                    <button id="modal-add-carrito" class="carousel-btn">Agregar al Carrito</button>
+                    <a id="modal-whatsapp-link" class="carousel-btn whatsapp-btn" target="_blank" rel="noreferrer">Contactar por WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

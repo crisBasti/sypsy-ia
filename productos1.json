@@ -121,18 +121,5 @@
     ],
     "descripcion": "Reparación y mantenimiento de computadoras",
     "whatsapp": "5491234567896"
-  },
-  {
-    "id": 14,
-    "nombre": "CAMISETA DE RIVER PLATE ",
-    "descripcion": "CAMMISETA DE RIVER PLATE ORIGINAL , BLANCA CON BANDA ROJA , CON NUMERO 10 , TALLE XL, NUEVA ",
-    "precio": 150000,
-    "categoria": "indumentaria",
-    "imagen": "camiseta_de_riverplate.jpg",
-    "imagenes": [
-      "camiseta_de_riverplate.jpg"
-    ],
-    "whatsapp": "1164521118",
-    "usuario": "Vitta Portillo"
   }
 ]

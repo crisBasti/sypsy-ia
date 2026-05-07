@@ -92,9 +92,11 @@ app.get('/api/productos', async (req, res) => {
 });
 
 app.post('/api/productos', async (req, res) => {
+  console.log('📨 POST /api/productos recibido:', req.body);
   try {
     const { nombre, descripcion, precio, categoria, imagen, whatsapp, usuario } = req.body;
     if (!nombre || !descripcion || !precio || !categoria || !imagen || !whatsapp || !usuario) {
+      console.log('❌ Faltan datos obligatorios');
       return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
 
@@ -109,51 +111,64 @@ app.post('/api/productos', async (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
+    console.log('💾 Guardando producto:', nuevoProducto.nombre);
+
     if (firebaseReady) {
       const docRef = await db.collection('productos').add(nuevoProducto);
+      console.log('✅ Producto guardado en Firestore con ID:', docRef.id);
       res.json({ id: docRef.id, ...nuevoProducto });
     } else {
       const id = String(Date.now());
       productosEnMemoria.push({ id, ...nuevoProducto });
+      console.log('⚠️ Producto guardado en memoria con ID:', id);
       res.json({ id, ...nuevoProducto });
     }
   } catch (error) {
-    console.error('Error creando producto:', error);
+    console.error('❌ Error creando producto:', error);
     res.status(500).json({ error: 'Error al crear producto' });
   }
 });
 
 app.post('/api/usuarios', async (req, res) => {
   try {
-    const { nombre, email, password, whatsapp } = req.body;
-    if (!nombre || !email || !password || !whatsapp) {
+    const { uid, nombre, email, password, whatsapp } = req.body;
+    if (!nombre || !email || !whatsapp) {
       return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
 
     if (firebaseReady) {
       try {
-        const userRecord = await admin.auth().createUser({
-          email,
-          password,
-          displayName: nombre,
-        });
-        await db.collection('usuarios').doc(userRecord.uid).set({
-          uid: userRecord.uid,
+        let userId = uid;
+
+        if (!uid) {
+          if (!password) {
+            return res.status(400).json({ error: 'La contraseña es obligatoria para crear el usuario en Firebase Auth' });
+          }
+          const userRecord = await admin.auth().createUser({
+            email,
+            password,
+            displayName: nombre,
+          });
+          userId = userRecord.uid;
+        }
+
+        await db.collection('usuarios').doc(userId).set({
+          uid: userId,
           nombre,
           email,
           whatsapp,
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
-        res.json({ uid: userRecord.uid, nombre, email, whatsapp });
+        res.json({ uid: userId, nombre, email, whatsapp });
       } catch (authError) {
         console.error('Error Firebase Auth:', authError.message);
         res.status(400).json({ error: authError.message });
       }
     } else {
       // Modo fallback en memoria
-      const uid = String(Date.now());
-      usuariosEnMemoria[uid] = { uid, nombre, email, whatsapp, createdAt: new Date().toISOString() };
-      res.json({ uid, nombre, email, whatsapp });
+      const userId = uid || String(Date.now());
+      usuariosEnMemoria[userId] = { uid: userId, nombre, email, whatsapp, createdAt: new Date().toISOString() };
+      res.json({ uid: userId, nombre, email, whatsapp });
     }
   } catch (error) {
     console.error('Error creando usuario:', error);
