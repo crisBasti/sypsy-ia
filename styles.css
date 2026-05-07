@@ -1016,3 +1016,35 @@ footer {
     }
 }
 
+/* Reemplaza el estilo de tu tarjeta con este bloque */
+.product-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%; /* Asegura que todas las tarjetas tengan la misma altura */
+    padding: 1.2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.product-description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #444;
+    margin-bottom: 1rem;
+    /* Limita a 3 líneas de texto para evitar que la tarjeta crezca infinito */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-price {
+    margin-top: auto; /* Empuja el precio al final de la tarjeta */
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #1a1a1a;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 0.8rem;
+}
